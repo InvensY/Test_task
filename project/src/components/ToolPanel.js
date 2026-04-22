@@ -260,7 +260,7 @@ export class ToolPanel extends HTMLElement {
     
     
     setupKeyboardShortcuts() {
-        document.addEventListener('keydown', this.handleKeyDown);
+        window.addEventListener('keydown', this.handleKeyDown);
     }
     
     handleKeyDown(event) {
