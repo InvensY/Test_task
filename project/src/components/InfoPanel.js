@@ -25,75 +25,113 @@ export class InfoPanel extends HTMLElement {
         this.shadowRoot.innerHTML = `
             <style>
                 .info-panel {
-                    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-                    border-radius: 16px;
+                    background: rgba(255, 255, 255, 0.95);
+                    backdrop-filter: blur(10px);
+                    border-radius: 20px;
                     padding: 20px;
-                    color: #f1f5f9;
-                    font-family: system-ui, -apple-system, sans-serif;
+                    border: 1px solid rgba(79, 70, 229, 0.2);
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
                 }
+
+                .info-panel:hover {
+                    transform: translateY(-2px);
+                    border-color: rgba(79, 70, 229, 0.4);
+                    box-shadow: 0 8px 24px rgba(79, 70, 229, 0.15);
+                }
+
                 .stat {
-                    background: #334155;
-                    border-radius: 12px;
-                    padding: 12px 16px;
+                    background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+                    border-radius: 16px;
+                    padding: 14px 16px;
                     margin-bottom: 16px;
                     display: flex;
                     justify-content: space-between;
+                    align-items: center;
                 }
+
                 .stat-value {
-                    font-size: 28px;
+                    font-size: 32px;
                     font-weight: 700;
-                    color: #3b82f6;
+                    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+                    -webkit-background-clip: text;
+                    background-clip: text;
+                    color: transparent;
                 }
+
                 .selected-section {
-                    background: #334155;
-                    border-radius: 12px;
-                    padding: 12px 16px;
+                    background: rgba(243, 244, 246, 0.7);
+                    border-radius: 16px;
+                    padding: 16px;
                 }
+
                 .section-title {
-                    font-size: 14px;
+                    font-size: 13px;
+                    font-weight: 600;
                     margin-bottom: 12px;
+                    color: #6b7280;
                 }
+
                 .info-row {
                     display: flex;
                     justify-content: space-between;
-                    font-size: 13px;
-                    padding: 6px 0;
-                    border-bottom: 1px solid #475569;
+                    padding: 10px 0;
+                    border-bottom: 1px solid rgba(79, 70, 229, 0.1);
                 }
+
+                .info-row:last-child {
+                    border-bottom: none;
+                }
+
                 .info-label {
-                    opacity: 0.7;
+                    color: #6b7280;
+                    font-size: 13px;
                 }
+
                 .info-value {
-                    font-weight: 500;
-                    color: #facc15;
+                    font-weight: 600;
+                    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+                    -webkit-background-clip: text;
+                    background-clip: text;
+                    color: transparent;
                 }
+
                 .no-selection {
                     text-align: center;
                     padding: 20px;
-                    opacity: 0.5;
+                    color: #9ca3af;
+                    font-size: 13px;
                 }
+
                 .preview-canvas {
-                    width: 100%;
-                    height: 100px;
-                    background: #1e293b;
-                    border-radius: 8px;
-                    margin-top: 10px;
-                    border: 1px solid #475569;
+                    margin-top: 16px;
+                    border-radius: 12px;
+                    background: #f9fafb;
+                    border: 1px solid rgba(79, 70, 229, 0.2);
                 }
+
                 .color-input {
-                    width: 50px;
+                    width: 40px;
                     height: 30px;
-                    border: 2px solid #475569;
+                    border: 1px solid rgba(79, 70, 229, 0.3);
                     border-radius: 8px;
                     cursor: pointer;
-                    background: transparent;
+                    background: white;
+                    transition: all 0.2s ease;
                 }
-                .color-input::-webkit-color-swatch-wrapper {
-                    padding: 0;
+                
+                .color-input:hover {
+                    transform: scale(1.05);
+                    border-color: #4f46e5;
                 }
-                .color-input::-webkit-color-swatch {
-                    border: none;
-                    border-radius: 6px;
+
+                @media (max-width: 640px) {
+                    .info-panel {
+                        padding: 16px;
+                    }
+                    .stat-value {
+                        font-size: 28px;
+                    }
                 }
             </style>
             

@@ -36,18 +36,82 @@ export class CanvasView extends HTMLElement {
           display: block;
           width: 100%;
           height: 100%;
-          position: relative;
         }
+        
+        .canvas-wrapper {
+          width: 100%;
+          height: 100%;
+          position: relative;
+          background: #fafbff;
+          border-radius: 24px;
+          overflow: hidden;
+        }
+        
         canvas {
           width: 100%;
           height: 100%;
           display: block;
           cursor: pointer;
-          border-radius: 12px;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+          transition: all 0.3s ease;
         }
+        
         canvas:active {
           cursor: grabbing;
+        }
+        
+        .canvas-info {
+          position: absolute;
+          bottom: 1rem;
+          right: 1rem;
+          background: rgba(79, 70, 229, 0.9);
+          backdrop-filter: blur(8px);
+          padding: 0.5rem 1rem;
+          border-radius: 2rem;
+          color: white;
+          font-size: 0.75rem;
+          font-weight: 600;
+          pointer-events: none;
+          z-index: 10;
+          font-family: monospace;
+          box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
+          animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+          0%, 100% {
+            transform: scale(1);
+          }
+          50% {
+            transform: scale(1.05);
+          }
+        }
+        
+        @keyframes ripple {
+          0% {
+            transform: scale(0);
+            opacity: 0.5;
+          }
+          100% {
+            transform: scale(4);
+            opacity: 0;
+          }
+        }
+        
+        .ripple-effect {
+          position: absolute;
+          border-radius: 50%;
+          background: rgba(79, 70, 229, 0.3);
+          pointer-events: none;
+          animation: ripple 0.6s ease-out;
+        }
+        
+        @media (max-width: 640px) {
+          .canvas-info {
+            bottom: 0.5rem;
+            right: 0.5rem;
+            padding: 0.375rem 0.75rem;
+            font-size: 0.688rem;
+          }
         }
       </style>
       <canvas></canvas>
@@ -295,7 +359,7 @@ export class CanvasView extends HTMLElement {
       const center = this.getPolygonCenter(polygon);
       
       let progress = 0;
-      const duration = 300; // 300 мс
+      const duration = 100; // 100 мс
       const startTime = performance.now();
       
       const animate = (currentTime) => {

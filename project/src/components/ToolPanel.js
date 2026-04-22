@@ -51,79 +51,184 @@ export class ToolPanel extends HTMLElement {
         this.shadowRoot.innerHTML = `
             <style>
                 .toolbar {
+                    background: rgba(255, 255, 255, 0.95);
+                    backdrop-filter: blur(10px);
+                    border-radius: 20px;
+                    margin-bottom:25px;
+                    padding: 16px;
                     display: flex;
                     flex-wrap: wrap;
-                    gap: 12px;
-                    padding: 16px 20px;
-                    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-                    border-radius: 16px;
-                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-                    margin-bottom: 20px;
+                    gap: 10px;
+                    border: 1px solid rgba(79, 70, 229, 0.2);
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
                 }
-                
+
+                .toolbar:hover {
+                    transform: translateY(-2px);
+                    border-color: rgba(79, 70, 229, 0.4);
+                    box-shadow: 0 8px 24px rgba(79, 70, 229, 0.15);
+                }
+
                 button {
+                    padding: 10px 18px;
+                    font-size: 14px;
+                    font-weight: 500;
+                    border: none;
+                    border-radius: 14px;
+                    cursor: pointer;
+                    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
                     display: inline-flex;
                     align-items: center;
                     gap: 8px;
-                    padding: 10px 20px;
-                    font-size: 14px;
-                    font-weight: 500;
-                    font-family: inherit;
-                    border: none;
-                    border-radius: 12px;
-                    cursor: pointer;
-                    transition: all 0.2s ease;
-                    background: #334155;
-                    color: #f1f5f9;
-                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+                    background: #f3f4f6;
+                    color: #374151;
+                    border: 1px solid #e5e7eb;
                 }
-                
+
                 button:hover {
                     transform: translateY(-2px);
-                    filter: brightness(1.1);
-                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+                    background: #e5e7eb;
+                    border-color: #4f46e5;
+                    box-shadow: 0 8px 20px -6px rgba(79, 70, 229, 0.3);
                 }
                 
                 button:active {
-                    transform: translateY(0);
+                    transform: translateY(0) scale(0.98);
                 }
-                
+
                 .btn-primary {
-                    background: linear-gradient(135deg, #3b82f6, #2563eb);
+                    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+                    border: none;
+                    color: white;
                 }
-                
+
+                .btn-primary:hover {
+                    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                    box-shadow: 0 8px 20px -6px #4f46e5;
+                    transform: translateY(-2px);
+                }
+
                 .btn-danger {
                     background: linear-gradient(135deg, #ef4444, #dc2626);
+                    border: none;
+                    color: white;
                 }
-                
+
+                .btn-danger:hover {
+                    background: linear-gradient(135deg, #dc2626, #b91c1c);
+                    box-shadow: 0 8px 20px -6px #ef4444;
+                }
+
                 .btn-warning {
                     background: linear-gradient(135deg, #f59e0b, #d97706);
+                    border: none;
+                    color: white;
                 }
                 
+                .btn-warning:hover {
+                    background: linear-gradient(135deg, #d97706, #b45309);
+                    box-shadow: 0 8px 20px -6px #f59e0b;
+                }
+
                 .btn-secondary {
-                    background: linear-gradient(135deg, #64748b, #475569);
+                    background: #f9fafb;
+                    border: 1px solid #e5e7eb;
+                    color: #374151;
                 }
                 
+                .btn-secondary:hover {
+                    background: #ffffff;
+                    border-color: #4f46e5;
+                }
+
                 .separator {
                     width: 1px;
-                    height: 40px;
-                    background: #475569;
-                    margin: 0 8px;
+                    height: 36px;
+                    background: linear-gradient(to bottom, transparent, #e5e7eb, transparent);
+                    margin: 0 4px;
                 }
-                
+
                 .shortcut {
                     font-size: 11px;
                     opacity: 0.7;
-                    background: rgba(0,0,0,0.3);
-                    padding: 2px 6px;
-                    border-radius: 6px;
+                    font-family: monospace;
+                }
+
+                @keyframes bounceIn {
+                    0% {
+                        transform: scale(0.8);
+                        opacity: 0;
+                    }
+                    70% {
+                        transform: scale(1.05);
+                    }
+                    100% {
+                        transform: scale(1);
+                        opacity: 1;
+                    }
+                }
+
+                button {
+                    animation: bounceIn 0.3s ease-out backwards;
                 }
                 
-                @media (max-width: 700px) {
-                    .toolbar { gap: 8px; padding: 12px; }
-                    button { padding: 8px 14px; font-size: 12px; }
-                    .shortcut { display: none; }
+                button:nth-child(1) { animation-delay: 0.05s; }
+                button:nth-child(2) { animation-delay: 0.1s; }
+                button:nth-child(3) { animation-delay: 0.15s; }
+                button:nth-child(5) { animation-delay: 0.2s; }
+                button:nth-child(6) { animation-delay: 0.25s; }
+                button:nth-child(7) { animation-delay: 0.3s; }
+                button:nth-child(8) { animation-delay: 0.35s; }
+
+                @media (max-width: 768px) {
+                    .toolbar {
+                        padding: 12px;
+                        gap: 8px;
+                    }
+                    
+                    button {
+                        padding: 8px 14px;
+                        font-size: 13px;
+                    }
+                    
+                    .shortcut {
+                        display: none;
+                    }
                 }
+                
+                @media (max-width: 640px) {
+                    .toolbar {
+                        padding: 10px;
+                        gap: 6px;
+                    }
+                    
+                    button {
+                        padding: 6px 12px;
+                        font-size: 12px;
+                    }
+                    
+                    .separator {
+                        height: 28px;
+                    }
+                }
+                
+                @media (max-width: 480px) {
+                    .toolbar {
+                        flex-direction: column;
+                    }
+                    
+                    .separator {
+                        width: 100%;
+                        height: 1px;
+                        margin: 4px 0;
+                    }
+                    
+                    button {
+                        width: 100%;
+                        justify-content: center;
+                    }
+
             </style>
             
             <div class="toolbar">
