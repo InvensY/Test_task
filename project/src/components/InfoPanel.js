@@ -248,29 +248,16 @@ export class InfoPanel extends HTMLElement {
     }
     
     changePolygonColor(hexColor) {
-        console.log('changePolygonColor вызван, hexColor:', hexColor);
-        
         const canvas = this.getCanvasView();
-        if (!canvas) {
-            console.log('Canvas не найден');
-            return;
+        if (canvas && canvas.changeSelectedPolygonColor) {
+            canvas.changeSelectedPolygonColor(hexColor);
+            // Обновляем цвет в миниатюре
+            setTimeout(() => {
+                if (this.selectedPolygon) {
+                    this.drawPreview(this.selectedPolygon.points, hexColor);
+                }
+            }, 50);
         }
-        
-        if (!canvas.selectedPolygon) {
-            console.log('Нет выбранного полигона в canvas');
-            this.showToast('❌ Сначала выберите полигон');
-            return;
-        }
-        
-        // Меняем цвет
-        canvas.changeSelectedPolygonColor(hexColor);
-        
-        // Обновляем локальный selectedPolygon
-        this.selectedPolygon = canvas.selectedPolygon;
-        
-        // Обновляем отображение
-        this.updateSelectedInfo();
-
     }
         drawPreview(vertices, color) {
         const previewCanvas = this.shadowRoot.getElementById('previewCanvas');

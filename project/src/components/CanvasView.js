@@ -493,12 +493,6 @@ changeSelectedPolygonColor(hexColor) {
     this.draw();
 
     this.saveToHistory();
-    // Отправляем событие, что полигон все еще выбран (обновляем InfoPanel)
-    this.dispatchEvent(new CustomEvent('polygon-selected', {
-        detail: { polygon: this.selectedPolygon },
-        bubbles: true,
-        composed: true
-    }));
     
     // Уведомляем другие компоненты
     this.dispatchEvent(new CustomEvent('polygons-updated', { bubbles: true, composed: true }));
