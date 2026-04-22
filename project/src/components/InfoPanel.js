@@ -72,6 +72,14 @@ export class InfoPanel extends HTMLElement {
                     padding: 20px;
                     opacity: 0.5;
                 }
+                .preview-canvas {
+                    width: 100%;
+                    height: 100px;
+                    background: #1e293b;
+                    border-radius: 8px;
+                    margin-top: 10px;
+                    border: 1px solid #475569;
+                }
             </style>
             
             <div class="info-panel">
@@ -88,6 +96,7 @@ export class InfoPanel extends HTMLElement {
             </div>
         `;
     }
+
     
     setupEventListeners() {
         document.addEventListener('polygons-updated', () => this.updateInfo());
@@ -172,7 +181,61 @@ export class InfoPanel extends HTMLElement {
                 <span class="info-label">📍 Центр</span>
                 <span class="info-value">(${cx}, ${cy})</span>
             </div>
+            <canvas id="previewCanvas" class="preview-canvas"></canvas>
         `;
+        requestAnimationFrame(() => {
+            this.drawPreview(vertices, p.color);
+        });
+    }
+        drawPreview(vertices, color) {
+        const previewCanvas = this.shadowRoot.getElementById('previewCanvas');
+        if (!previewCanvas) return;
+        
+        const rect = previewCanvas.parentElement.getBoundingClientRect();
+        previewCanvas.width = rect.width - 32 || 200;
+        previewCanvas.height = 100;
+        
+        const ctx = previewCanvas.getContext('2d');
+        ctx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+        
+        if (!vertices || vertices.length < 3) return;
+        
+        let minX = Infinity, minY = Infinity;
+        let maxX = -Infinity, maxY = -Infinity;
+        for (const v of vertices) {
+            minX = Math.min(minX, v.x);
+            minY = Math.min(minY, v.y);
+            maxX = Math.max(maxX, v.x);
+            maxY = Math.max(maxY, v.y);
+        }
+        
+        const polyWidth = maxX - minX;
+        const polyHeight = maxY - minY;
+        const scale = Math.min(
+            (previewCanvas.width - 20) / polyWidth,
+            (previewCanvas.height - 20) / polyHeight
+        );
+        
+        const offsetX = (previewCanvas.width - polyWidth * scale) / 2;
+        const offsetY = (previewCanvas.height - polyHeight * scale) / 2;
+        
+        ctx.beginPath();
+        const firstX = offsetX + (vertices[0].x - minX) * scale;
+        const firstY = offsetY + (vertices[0].y - minY) * scale;
+        ctx.moveTo(firstX, firstY);
+        
+        for (let i = 1; i < vertices.length; i++) {
+            const x = offsetX + (vertices[i].x - minX) * scale;
+            const y = offsetY + (vertices[i].y - minY) * scale;
+            ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.strokeStyle = '#facc15';
+        ctx.lineWidth = 2;
+        ctx.stroke();
     }
 }
 
