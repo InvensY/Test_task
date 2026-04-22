@@ -183,6 +183,10 @@ export class InfoPanel extends HTMLElement {
         
         this.selectedInfoContainer.innerHTML = `
             <div class="info-row">
+                <span class="info-label">🆔 ID</span>
+                <span class="info-value">${p.id.slice(0, 8)}...</span>
+            </div>
+            <div class="info-row">
                 <span class="info-label">🎨 Цвет</span>
                 <span class="info-value"><input type="color" class="color-input" id="polygonColorPicker" 
                 value="${hexColor}">

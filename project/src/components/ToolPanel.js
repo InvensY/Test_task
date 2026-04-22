@@ -23,7 +23,7 @@ export class ToolPanel extends HTMLElement {
     
     disconnectedCallback() {
         // Убираем глобальные слушатели при удалении компонента
-        window.removeEventListener('keydown', this.handleKeyDown);
+        document.removeEventListener('keydown', this.handleKeyDown);
         
         // Очищаем обработчики кнопок
         const generateBtn = this.shadowRoot?.getElementById('generateBtn');
@@ -152,6 +152,13 @@ export class ToolPanel extends HTMLElement {
                     ↪️ Повторить
                     <span class="shortcut">Ctrl+Y</span>
                 </button>
+                <button id="exportBtn" class="btn-secondary">
+                    💾 Экспорт
+                </button>
+                <button id="importBtn" class="btn-secondary">
+                    📁 Импорт
+                </button>
+                <input type="file" id="importFile" style="display: none;" accept=".json">
             </div>
         `;
     }
@@ -186,6 +193,36 @@ export class ToolPanel extends HTMLElement {
                 }
             };
             deleteBtn.addEventListener('click', this.handleDelete);
+        }
+        // Кнопка "Экспорт"
+        const exportBtn = this.shadowRoot.getElementById('exportBtn');
+        if (exportBtn) {
+            exportBtn.addEventListener('click', () => {
+                const canvas = this.getCanvasView();
+                if (canvas && canvas.exportScene) {
+                    canvas.exportScene();
+                }
+            });
+        }
+
+        // Кнопка "Импорт"
+        const importBtn = this.shadowRoot.getElementById('importBtn');
+        const importFile = this.shadowRoot.getElementById('importFile');
+        if (importBtn && importFile) {
+            importBtn.addEventListener('click', () => {
+                importFile.click();
+            });
+            
+            importFile.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    const canvas = this.getCanvasView();
+                    if (canvas && canvas.importScene) {
+                        canvas.importScene(file);
+                    }
+                }
+                importFile.value = ''; // очищаем input
+            });
         }
         
         // Кнопка "Удалить все"
@@ -223,7 +260,7 @@ export class ToolPanel extends HTMLElement {
     
     
     setupKeyboardShortcuts() {
-        window.addEventListener('keydown', this.handleKeyDown);
+        document.addEventListener('keydown', this.handleKeyDown);
     }
     
     handleKeyDown(event) {

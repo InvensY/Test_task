@@ -499,6 +499,72 @@ changeSelectedPolygonColor(hexColor) {
     
     return true;
 }
+
+// Экспорт сцены
+exportScene() {
+    const sceneData = {
+        version: "1.0",
+        timestamp: Date.now(),
+        polygons: this.polygons,
+        selectedPolygonId: this.selectedPolygon?.id || null
+    };
+    
+    const json = JSON.stringify(sceneData, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `polygon-scene-${Date.now()}.json`;
+    a.click();
+    
+    URL.revokeObjectURL(url);
+    
+    this.showToast('💾 Сцена сохранена');
+}
+
+// Импорт сцены
+importScene(file) {
+    const reader = new FileReader();
+    
+    reader.onload = (event) => {
+        try {
+            const sceneData = JSON.parse(event.target.result);
+            
+            // Проверяем валидность данных
+            if (!sceneData.polygons || !Array.isArray(sceneData.polygons)) {
+                throw new Error('Неверный формат файла');
+            }
+            
+            // Сохраняем состояние ДО импорта (для Undo)
+            this.saveToHistory();
+            
+            // Восстанавливаем полигоны
+            this.polygons = sceneData.polygons;
+            
+            // Восстанавливаем выбранный полигон
+            if (sceneData.selectedPolygonId) {
+                this.selectedPolygon = this.polygons.find(p => p.id === sceneData.selectedPolygonId) || null;
+            } else {
+                this.selectedPolygon = null;
+            }
+            
+            this.draw();
+            
+            // Сохраняем состояние ПОСЛЕ импорта
+            this.saveToHistory();
+            
+            this.dispatchEvent(new CustomEvent('polygons-updated', { bubbles: true, composed: true }));
+            this.showToast(`📁 Загружено ${this.polygons.length} полигонов`);
+            
+        } catch (error) {
+            console.error('Ошибка импорта:', error);
+            this.showToast('❌ Ошибка при импорте файла');
+        }
+    };
+    
+    reader.readAsText(file);
+}
   
   showToast(message) {
     const toast = document.createElement('div');
