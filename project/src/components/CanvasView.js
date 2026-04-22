@@ -129,6 +129,9 @@ export class CanvasView extends HTMLElement {
     this.canvas.addEventListener('mousedown', this.boundMouseDown);
     window.addEventListener('mousemove', this.boundMouseMove);
     window.addEventListener('mouseup', this.boundMouseUp);
+    this.canvas.addEventListener('touchstart', this.boundMouseDown);
+    window.addEventListener('touchmove', this.boundMouseMove);
+    window.addEventListener('touchend', this.boundMouseUp);
     window.addEventListener('resize', this.boundResize);
     
     // Начальная отрисовка
@@ -142,6 +145,9 @@ export class CanvasView extends HTMLElement {
     this.canvas.removeEventListener('mousedown', this.boundMouseDown);
     window.removeEventListener('mousemove', this.boundMouseMove);
     window.removeEventListener('mouseup', this.boundMouseUp);
+    this.canvas.removeEventListener('touchstart', this.boundMouseDown);
+    window.removeEventListener('touchmove', this.boundMouseMove);
+    window.removeEventListener('touchend', this.boundMouseUp);
     window.removeEventListener('resize', this.boundResize);
     this.resizeObserver.disconnect();
   }
@@ -154,17 +160,35 @@ export class CanvasView extends HTMLElement {
     this.draw();
   }
   
-  // Получить координаты мыши относительно canvas
+
+  //получается координаты мыши
   getMousePosition(event) {
     const rect = this.canvas.getBoundingClientRect();
     const scaleX = this.canvas.width / rect.width;
     const scaleY = this.canvas.height / rect.height;
     
+    let clientX, clientY;
+    
+    // Проверяем тип события
+    if (event.touches && event.touches.length > 0) {
+        // Touch-событие
+        clientX = event.touches[0].clientX;
+        clientY = event.touches[0].clientY;
+    } else if (event.changedTouches && event.changedTouches.length > 0) {
+        // touchend событие (changedTouches)
+        clientX = event.changedTouches[0].clientX;
+        clientY = event.changedTouches[0].clientY;
+    } else {
+        // Mouse-событие
+        clientX = event.clientX;
+        clientY = event.clientY;
+    }
+    
     return {
-      x: (event.clientX - rect.left) * scaleX,
-      y: (event.clientY - rect.top) * scaleY
+        x: (clientX - rect.left) * scaleX,
+        y: (clientY - rect.top) * scaleY
     };
-  }
+}
   
   // Найти полигон под курсором
   findPolygonAtPoint(point) {
@@ -178,6 +202,11 @@ export class CanvasView extends HTMLElement {
   
   // Обработчик нажатия мыши
   onMouseDown(event) {
+
+    // Предотвращаем скролл на тач-устройствах
+    event.preventDefault();
+    event.stopPropagation();
+
     const pos = this.getMousePosition(event);
     const polygon = this.findPolygonAtPoint(pos);
     
@@ -220,6 +249,9 @@ export class CanvasView extends HTMLElement {
   // Обработчик движения мыши
   onMouseMove(event) {
     if (!this.dragging || !this.selectedPolygon) return;
+
+    // Предотвращаем скролл при перетаскивании
+    event.preventDefault();
     
     const pos = this.getMousePosition(event);
     const center = this.getPolygonCenter(this.selectedPolygon);
