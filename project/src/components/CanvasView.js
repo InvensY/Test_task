@@ -477,6 +477,34 @@ export class CanvasView extends HTMLElement {
     this.showToast('↪️ Нечего повторять');
     return false;
   }
+
+  // Изменить цвет выбранного полигона
+changeSelectedPolygonColor(hexColor) {
+    if (!this.selectedPolygon) {
+        this.showToast('❌ Сначала выберите полигон');
+        return false;
+    }
+    
+    // Сохраняем состояние ДО изменения
+    this.saveToHistory();
+    
+    // Меняем цвет
+    this.selectedPolygon.color = hexColor;
+    this.draw();
+
+    this.saveToHistory();
+    // Отправляем событие, что полигон все еще выбран (обновляем InfoPanel)
+    this.dispatchEvent(new CustomEvent('polygon-selected', {
+        detail: { polygon: this.selectedPolygon },
+        bubbles: true,
+        composed: true
+    }));
+    
+    // Уведомляем другие компоненты
+    this.dispatchEvent(new CustomEvent('polygons-updated', { bubbles: true, composed: true }));
+    
+    return true;
+}
   
   showToast(message) {
     const toast = document.createElement('div');

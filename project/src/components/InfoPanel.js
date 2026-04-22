@@ -80,6 +80,21 @@ export class InfoPanel extends HTMLElement {
                     margin-top: 10px;
                     border: 1px solid #475569;
                 }
+                .color-input {
+                    width: 50px;
+                    height: 30px;
+                    border: 2px solid #475569;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    background: transparent;
+                }
+                .color-input::-webkit-color-swatch-wrapper {
+                    padding: 0;
+                }
+                .color-input::-webkit-color-swatch {
+                    border: none;
+                    border-radius: 6px;
+                }
             </style>
             
             <div class="info-panel">
@@ -163,11 +178,15 @@ export class InfoPanel extends HTMLElement {
         }
         const width = Math.round(maxX - minX);
         const height = Math.round(maxY - minY);
+        // Получаем HEX цвет
+        const hexColor = this.rgbToHex(p.color);
         
         this.selectedInfoContainer.innerHTML = `
             <div class="info-row">
                 <span class="info-label">🎨 Цвет</span>
-                <span class="info-value">${p.color}</span>
+                <span class="info-value"><input type="color" class="color-input" id="polygonColorPicker" 
+                value="${hexColor}">
+                </span>
             </div>
             <div class="info-row">
                 <span class="info-label">🔷 Вершины</span>
@@ -183,9 +202,75 @@ export class InfoPanel extends HTMLElement {
             </div>
             <canvas id="previewCanvas" class="preview-canvas"></canvas>
         `;
+        // Добавляем обработчик для color picker
+        const colorPicker = this.selectedInfoContainer.querySelector('#polygonColorPicker');
+        if (colorPicker) {
+            colorPicker.addEventListener('change', (e) => {
+                this.changePolygonColor(e.target.value);
+            });
+        }
+
+        //миниатюра полигона
         requestAnimationFrame(() => {
             this.drawPreview(vertices, p.color);
         });
+    }
+    rgbToHex(color) {
+        // Если уже HEX, возвращаем как есть
+        if (color && color.startsWith('#')) return color;
+        
+        // Если HSL, конвертируем в HEX
+        if (color && color.startsWith('hsl')) {
+            const match = color.match(/hsl\(([\d.]+),\s*([\d.]+)%,\s*([\d.]+)%\)/);
+            if (match) {
+                let h = parseFloat(match[1]);
+                let s = parseFloat(match[2]) / 100;
+                let l = parseFloat(match[3]) / 100;
+                
+                let c = (1 - Math.abs(2 * l - 1)) * s;
+                let x = c * (1 - Math.abs((h / 60) % 2 - 1));
+                let m = l - c / 2;
+                
+                let r = 0, g = 0, b = 0;
+                if (h >= 0 && h < 60) { r = c; g = x; b = 0; }
+                else if (h >= 60 && h < 120) { r = x; g = c; b = 0; }
+                else if (h >= 120 && h < 180) { r = 0; g = c; b = x; }
+                else if (h >= 180 && h < 240) { r = 0; g = x; b = c; }
+                else if (h >= 240 && h < 300) { r = x; g = 0; b = c; }
+                else { r = c; g = 0; b = x; }
+                
+                const toHex = (val) => Math.round((val + m) * 255).toString(16).padStart(2, '0');
+                return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+            }
+        }
+        
+        return '#3b82f6';
+    }
+    
+    changePolygonColor(hexColor) {
+        console.log('changePolygonColor вызван, hexColor:', hexColor);
+        
+        const canvas = this.getCanvasView();
+        if (!canvas) {
+            console.log('Canvas не найден');
+            return;
+        }
+        
+        if (!canvas.selectedPolygon) {
+            console.log('Нет выбранного полигона в canvas');
+            this.showToast('❌ Сначала выберите полигон');
+            return;
+        }
+        
+        // Меняем цвет
+        canvas.changeSelectedPolygonColor(hexColor);
+        
+        // Обновляем локальный selectedPolygon
+        this.selectedPolygon = canvas.selectedPolygon;
+        
+        // Обновляем отображение
+        this.updateSelectedInfo();
+
     }
         drawPreview(vertices, color) {
         const previewCanvas = this.shadowRoot.getElementById('previewCanvas');
@@ -236,6 +321,44 @@ export class InfoPanel extends HTMLElement {
         ctx.strokeStyle = '#facc15';
         ctx.lineWidth = 2;
         ctx.stroke();
+    }
+        showToast(message) {
+        const toast = document.createElement('div');
+        toast.textContent = message;
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1e293b;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            z-index: 10000;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        `;
+        
+        if (!document.querySelector('#toast-styles')) {
+            const style = document.createElement('style');
+            style.id = 'toast-styles';
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.animation = 'slideIn 0.3s reverse';
+            setTimeout(() => {
+                if (toast.parentNode) toast.remove();
+            }, 300);
+        }, 2000);
     }
 }
 
