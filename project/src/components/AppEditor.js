@@ -87,6 +87,7 @@ export class AppEditor extends HTMLElement {
                 border: 1px solid rgba(79, 70, 229, 0.2);
                 transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                 animation: fadeInUp 0.5s ease-out;
+                margin-top:5px;
             }
             
             canvas-view:hover {
